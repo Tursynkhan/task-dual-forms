@@ -1,0 +1,28 @@
+$bg-color: #f0f6fc;
+$border-color: #c0c0c0;
+$text-color: #000;
+
+.navbar {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: $bg-color;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid $border-color;
+  font-family: sans-serif;
+}
+
+.link {
+  text-decoration: none;
+  color: $text-color;
+  font-size: 1.25rem;
+  font-weight: 500;
+  transition: transform 0.1s, font-weight 0.1s;
+
+}
+
+.linkActive {
+  @extend .link;
+  font-weight: 700;
+  transform: scale(1.1);
+}
