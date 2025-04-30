@@ -1,0 +1,145 @@
+$form-bg: #eaf1fb;
+$form-header-bg: #f0f6fc;
+$form-border: #c0c0c0;
+$btn-add-border: #6fae31;
+$error-color: #d33;
+
+.form {
+  background: $form-bg;
+  border: 1px solid $form-border;
+  border-radius: 5px;
+  overflow: hidden;
+
+  h2 {
+    background: $form-header-bg;
+    margin: 0;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-bottom: 1px solid $form-border;
+  }
+
+  .formRow {
+    display: grid;
+    grid-template-columns: 200px 1fr 100px;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid $form-border;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    label {
+      display: flex;
+      align-items: center;
+      font-weight: 500;
+    }
+
+    select,
+    input,
+    textarea {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid $form-border;
+      border-radius: 4px;
+      background: #fff;
+      font-size: 1rem;
+    }
+
+    textarea {
+      min-height: 6rem;
+      resize: vertical;
+    }
+    .inputWrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 3rem;
+    }
+  }
+  .addresses {
+    .addressList {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      .addressRow {
+        display: grid;
+        grid-template-columns: 30px 1fr 30px;
+        align-items: center;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid $form-border;
+
+        .wrap {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+        }
+        &:last-child {
+          border-bottom: none;
+        }
+
+        span {
+          cursor: grab;
+          font-size: 1.2rem;
+          line-height: 1;
+        }
+
+        select,
+        input {
+          padding: 0.4rem;
+        }
+
+        button {
+          background: none;
+          border: none;
+          cursor: pointer;
+          color: #c00;
+          font-size: 1.2rem;
+          line-height: 1;
+        }
+      }
+
+      .addAddressBtn {
+        display: inline-block;
+        align-self: flex-start;
+        padding: 0.5rem 1rem;
+        border: 1px solid $btn-add-border;
+        background: #fff;
+        color: #000;
+        border-radius: 4px;
+        font-size: 0.95rem;
+        cursor: pointer;
+      }
+    }
+  }
+  .requirements {
+    .checkbox {
+      margin-right: 20px;
+
+      input {
+        width: 20px;
+        margin-right: 6px;
+      }
+    }
+  }
+  .error {
+    grid-column: 2;
+    margin: 0.25rem 0 0;
+    color: $error-color;
+    font-size: 0.875rem;
+  }
+
+  .submitBtn {
+    display: block;
+    margin: 1rem auto;
+    padding: 0.75rem 1.5rem;
+    background: #0056b3;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+}
