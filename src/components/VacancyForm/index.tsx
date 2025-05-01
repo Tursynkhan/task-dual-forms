@@ -130,7 +130,7 @@ export default function VacancyForm() {
             {form.addresses.map((addr, id) => (
               <div key={id} className={styles.addressRow}>
                 <span>
-                  <img src="../public/drag-handle.png" alt="drag-handle" width={16} height={16} />
+                  <img src="/task-dual-forms/drag-handle.png" alt="drag-handle" width={16} height={16} />
                 </span>
                 <div className={styles.wrap}>
                   <select name="city" value={addr.city}
@@ -158,7 +158,7 @@ export default function VacancyForm() {
                   )}
                 </div>
                 <button type="button" onClick={() => dispatch(removeVacancyAddress(id))}>
-                  <img src="../public/delete.svg" alt="delete" width={16} height={16} />
+                  <img src="/task-dual-forms/delete.svg" alt="delete" width={16} height={16} />
                 </button>
               </div>
             ))}
