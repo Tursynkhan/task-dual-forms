@@ -109,7 +109,8 @@ export default function VacancyForm() {
         <div className={styles.formRow}>
           <label>Обязанности, требования, условия:</label>
           <textarea name='description'
-            value={form.description} onChange={handleChange} />
+            value={form.description} onChange={handleChange}
+            style={{ maxWidth: "800px" }} />
           {errors.description && <p className={styles.error}>{errors.description}</p>}
         </div>
 
