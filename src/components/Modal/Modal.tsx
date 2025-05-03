@@ -12,6 +12,7 @@ export default function Modal({ open, onClose }: ModalProps) {
       <div className={styles.modal} onClick={e => e.stopPropagation()}>
         <button className={styles.closeButton} onClick={onClose}>×</button>
         <div className={styles.content}>Вы успешно отправили форму</div>
+        <img src="/task-dual-forms/success.png" alt="success" width={48} height={48} className={styles.image} />
       </div>
     </div>
   );

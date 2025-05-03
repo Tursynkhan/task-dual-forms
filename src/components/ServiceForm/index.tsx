@@ -2,222 +2,144 @@ import { useState, ChangeEvent, FormEvent } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import {
   updateField as updateServiceField,
-  addAddress as addServiceAddress,
   updateAddress as updateServiceAddress,
-  removeAddress as removeServiceAddress,
   resetForm as resetServiceForm,
+  removeAddress as removeServiceAddress,
+  addAddress as addServiceAddress,
 } from '../../store/serviceFormSlice';
-import { Address } from '../../types/Service';
 import { ServiceErrors } from '../../types/Service';
+import { validateService } from '../../utils/validateService';
+import { useModal } from '../../hooks/useModal';
+import { FormField } from '../FormField';
+import { AddressList } from '../AddressList';
+import checkboxOptions from '../../utils/service';
 import Modal from '../Modal/Modal';
-import styles from '../FormCommon.module.scss';
+import styles from '../../assets/styles/FormCommon.module.scss';
 
 
 export default function ServiceForm() {
   const dispatch = useAppDispatch()
-  const service = useAppSelector(s => s.serviceForm)
-  const [isModalOpen, setModalOpen] = useState(false);
+  const form = useAppSelector(s => s.serviceForm)
+  const { isOpen, open, close } = useModal();
   const [errors, setErrors] = useState<ServiceErrors>({});
 
-  const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    const { name, value, type } = e.target;
+
+  const handleField = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value, type, } = e.target;
     const checked = type === 'checkbox' && (e.target as HTMLInputElement).checked;
-    dispatch(
-      updateServiceField({ [name]: type === 'checkbox' ? checked : value })
-    );
+    dispatch(updateServiceField({ [name]: type === 'checkbox' ? checked : value }));
   };
 
-  const handleAddressChange = (
-    id: number,
-    field: keyof Address,
-    value: string
-  ) => {
-    dispatch(updateServiceAddress({ id, data: { ...service.addresses[id], [field]: value } }));
-  };
+  const handleAddr = (i: number, field: keyof typeof form.addresses[0], value: string) =>
+    dispatch(updateServiceAddress({ id: i, data: { ...form.addresses[i], [field]: value } }));
 
-  const validate = (): boolean => {
-    const errs: ServiceErrors = {};
-    if (!service.description) errs.description = 'Обязательное поле';
-    if (!service.city) errs.city = 'Обязательное поле';
-    const addrErrs = service.addresses.map(() => ({} as { city?: string; detail?: string }));
-    service.addresses.forEach((a, i) => {
-      if (!a.city) addrErrs[i].city = 'Укажите город';
-      if (!a.street) addrErrs[i].detail = 'Укажите адрес';
-    });
-    errs.addresses = addrErrs;
-    if (!service.contactMethod) errs.contactMethod = 'Обязательное поле';
-    if (!service.budget) errs.budget = 'Обязательное поле';
-    if (!service.budgetType) errs.budgetType = 'Обязательное поле';
-    setErrors(errs);
-    return !(
-      errs.description ||
-      errs.city ||
-      errs.addresses.some(e => e.city || e.street) ||
-      errs.contactMethod ||
-      errs.budget ||
-      errs.budgetType
-    );
-  };
+
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (!validate()) return;
-    console.log(service);
+    const errs = validateService(form);
+    setErrors(errs);
+    console.log('1')
+    console.log(form);
+    const hasError = Object.values(errs).some(
+      v => v !== undefined
+    ) || (errs.addresses?.some(a => a.city || a.street) ?? false);
+    console.log(hasError)
+    console.log('error:', errs)
+    if (hasError) return;
     dispatch(resetServiceForm());
-    setModalOpen(true);
+    open();
   };
-  const closeModal = () => setModalOpen(false);
 
   return (
     <>
       <form onSubmit={onSubmit} className={styles.form}>
         <h2>О заявке</h2>
 
-        <div className={styles.formRow}>
-          <label>Описание:</label>
+        <FormField label="Описание" htmlFor="description" error={errors.description} required>
           <textarea
+            id="description"
             name="description"
-            value={service.description}
-            onChange={handleChange}
+            value={form.description}
+            onChange={handleField}
           />
-          {errors.description && <p className={styles.error}>{errors.description}</p>}
+        </FormField>
 
-        </div>
-
-        <div className={styles.formRow}>
-          <label>Город заявки:</label>
-          <select name="city" value={service.city} onChange={handleChange}>
+        <FormField label="Город заявки:" htmlFor="city" error={errors.city} required>
+          <select id="city" name="city" value={form.city} onChange={handleField}>
             <option value="">Выберите...</option>
             <option value="Almaty">Алма-Ата</option>
             <option value="Astana">Астана</option>
           </select>
-          {errors.city && <p className={styles.error}>{errors.city}</p>}
+        </FormField>
 
-        </div>
-
-        <div className={`${styles.formRow} ${styles.addresses}`}>
-          <label>Адрес:</label>
-          <div className={styles.addressList}>
-            {service.addresses.map((addr, id) => (
-              <div key={id} className={styles.addressRow}>
-                <span>
-                  <img src="/task-dual-forms/drag-handle.png" alt="drag-handle" width={16} height={16} />
-                </span>
-                <div className={styles.wrap}>
-                  <select name='address' value={addr.city}
-                    onChange={(e) => handleAddressChange(id, 'city', e.target.value)}
-                  >
-                    <option value="">Выберите...</option>
-                    <option value="Almaty">Алма-Ата</option>
-                    <option value="Astana">Астана</option>
-                  </select>
-                  {errors.addresses?.[id]?.city && (
-                    <p className={styles.error}>
-                      {errors.addresses[id]!.city}
-                    </p>
-                  )}
-
-                  <input
-                    name="street"
-                    placeholder="Улица"
-                    value={addr.street}
-                    onChange={(e) => handleAddressChange(id, 'street', e.target.value)} />
-                  {errors.addresses?.[id]?.street && (
-                    <p className={styles.error}>
-                      {errors.addresses[id]!.street}
-                    </p>
-                  )}
-
-                </div>
-                <button type="button" onClick={() => dispatch(removeServiceAddress(id))}>
-                  <img src="/task-dual-forms/delete.svg" alt="delete" width={16} height={16} />
-                </button>
-              </div>
-            ))}
-            <button
-              type="button"
-              className={styles.addAddressBtn}
-              onClick={() => dispatch(addServiceAddress())}
-            >
-              Добавить ещё адрес
-            </button>
-          </div>
-        </div>
-
-        <div className={styles.formRow}>
-          <label>Способ связи:</label>
-          <select name="contactMethod" value={service.contactMethod} onChange={handleChange}>
+        <FormField label="Адрес:"
+          htmlFor="addresses"
+          required
+          error={errors.addresses?.some(a => a.city || a.street) ? "Укажите адрес" : undefined}>
+          <AddressList
+            addresses={form.addresses}
+            cityOptions={[{ value: 'Almaty', label: 'Алма-Ата' }, { value: 'Astana', label: 'Астана' }]}
+            onChange={handleAddr}
+            onRemove={i => dispatch(removeServiceAddress(i))}
+            onAdd={() => dispatch(addServiceAddress())}
+            errors={errors.addresses}
+          />
+        </FormField>
+        <FormField label="Способ связи" htmlFor="contactMethod" error={errors.contactMethod} required>
+          <select id="contactMethod" name="contactMethod" value={form.contactMethod} onChange={handleField}>
             <option value="">Выберите...</option>
             <option value="call">Позвонить</option>
             <option value="message">Написать</option>
           </select>
-          {errors.contactMethod && (
-            <p className={styles.error}>Обязательное поле</p>
-          )}
-        </div>
+        </FormField>
 
-        <div className={styles.formRow} >
-          <label>Сколько готовы заплатить:</label>
+        <FormField label="Сколько готовы заплатить:" htmlFor="budget" error={errors.budget} required>
           <div className={styles.inputWrap}>
             <input
+              id="budget"
               name="budget"
               type="number"
-              value={service.budget}
-              onChange={handleChange}
+              min={0}
+              onWheel={(e) => e.currentTarget.blur()}
+              value={form.budget}
+              onChange={handleField}
             />
-            {errors.budget && <p className={styles.error}>{errors.budget}</p>}
-
-            <select name="budgetType" value={service.budgetType} onChange={handleChange}>
+            <select id="budgetType" name="budgetType" value={form.budgetType} onChange={handleField}>
               <option value="">Выберите...</option>
               <option value="total">За всю работу</option>
               <option value="hour">За час</option>
             </select>
-            {errors.budgetType && <p className={styles.error}>{errors.budgetType}</p>}
-
+            {errors.budgetType && (
+              <p className={styles.error}>{errors.budgetType}</p>
+            )}
           </div>
-        </div>
-        <div className={`${styles.formRow} ${styles.requirements}`}>
-          <label>Требования к специалистам:</label>
+        </FormField>
+
+        <FormField
+          label="Требования к специалистам:"
+          htmlFor=""
+          className={styles.requirements}
+        >
           <div className={styles.inputWrap}>
-            <label className={styles.checkbox}>
-              <input
-                name="requirementsConfirmed"
-                type="checkbox"
-                checked={service.requirementsConfirmed}
-                onChange={handleChange}
-
-              />
-              Личность подтверждена
-            </label>
-            <label className={styles.checkbox}>
-              <input
-                name="requirementsWithPhotos"
-                type="checkbox"
-                checked={service.requirementsWithPhotos}
-                onChange={handleChange}
-
-              />
-              С фото работ в анкете
-            </label>
-            <label className={styles.checkbox}>
-              <input
-                name="requirementsWithReviews"
-                type="checkbox"
-                checked={service.requirementsWithReviews}
-                onChange={handleChange}
-
-              />
-              С отзывами
-            </label>
+            {checkboxOptions.map(({ name, label }) => (
+              <label key={name} className={styles.checkbox}>
+                <input
+                  type="checkbox"
+                  name={name}
+                  checked={form[name]}
+                  onChange={handleField}
+                />
+                <span>{label}</span>
+              </label>
+            ))}
           </div>
-        </div>
+        </FormField>
 
         <button type="submit" className={styles.submitBtn}>
           Отправить
         </button>
-      </form>
-      <Modal open={isModalOpen} onClose={closeModal} />
+      </form >
+      <Modal open={isOpen} onClose={close} />
     </>
 
   );

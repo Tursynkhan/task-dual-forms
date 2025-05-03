@@ -3,7 +3,7 @@ $modal-bg: #ffffff;
 $modal-radius: 8px;
 $modal-padding: 1.5rem;
 $shadow-color: rgba(0, 0, 0, 0.2);
-$close-size: 1.25rem;
+$close-size: 2rem;
 
 .overlay {
   position: fixed;
@@ -19,10 +19,16 @@ $close-size: 1.25rem;
 }
 
 .modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 1rem;
   background: $modal-bg;
   padding: $modal-padding;
   border-radius: $modal-radius;
   max-width: 90%;
+  height: 200px;
   width: 400px;
   box-shadow: 0 2px 12px $shadow-color;
   position: relative;
@@ -41,6 +47,12 @@ $close-size: 1.25rem;
 
 .content {
   margin-top: 1rem;
-  font-size: 1rem;
+  font-size: 1.5rem;
   text-align: center;
+}
+
+.image{
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

@@ -1,0 +1,79 @@
+$form-border: #c0c0c0;
+$btn-add-border: #6fae31;
+$error-color: #d33;
+
+.addressList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .addressRow {
+    display: grid;
+    grid-template-columns: 30px 1fr 30px;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid $form-border;
+
+    .wrap {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    &:last-child {
+      border-bottom: none;
+    }
+
+    span {
+      cursor: grab;
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+
+    select,
+    input {
+      padding: 0.4rem;
+    }
+
+    button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #c00;
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+  }
+
+  .addAddressBtn {
+    display: inline-block;
+    align-self: flex-start;
+    padding: 0.5rem 1rem;
+    border: 1px solid $btn-add-border;
+    background: #fff;
+    color: #000;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    cursor: pointer;
+  }
+}
+.error {
+  grid-column: 2;
+  margin: 0.25rem 0 0;
+  color: $error-color;
+  font-size: 0.75rem;
+}
+@media screen and (max-width: 768px) {
+  .form {
+    .formRow {
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+    }
+    .addresses {
+      .addressList {
+        .addressRow {
+          grid-template-rows: 1fr;
+        }
+      }
+    }
+  }
+}

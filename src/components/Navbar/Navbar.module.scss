@@ -1,4 +1,4 @@
-$bg-color: #f0f6fc;
+$bg-color: #d7ebff;
 $border-color: #c0c0c0;
 $text-color: #000;
 
@@ -6,10 +6,15 @@ $text-color: #000;
   display: flex;
   justify-content: space-around;
   align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   background: $bg-color;
   padding: 1rem 2rem;
   border-bottom: 1px solid $border-color;
   font-family: "Times New Roman", serif;
+  z-index: 2;
 }
 
 .link {
@@ -25,4 +30,10 @@ $text-color: #000;
   @extend .link;
   font-weight: 700;
   transform: scale(1.1);
+}
+
+@media screen and (max-width: 768px) {
+  .link {
+    font-size: 1rem;
+  } 
 }

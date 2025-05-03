@@ -1,0 +1,78 @@
+$form-border: #c0c0c0;
+$error-color: #d33;
+
+.formRow {
+  display: grid;
+  grid-template-columns: 280px 1fr 150px;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid $form-border;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  label {
+    font-weight: 500;
+    font-size: 1rem;
+  }
+
+  select,
+  input,
+  textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid $form-border;
+    border-radius: 4px;
+    background: #fff;
+    font-size: 0.875rem;
+  }
+
+  textarea {
+    min-height: 6rem;
+    resize: vertical;
+  }
+  .inputWrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 3rem;
+    .error {
+      grid-column: 2;
+      margin: 0.25rem 0 0;
+      color: $error-color;
+      font-size: 0.75rem;
+    }
+  }
+  .asterisk {
+    color: $error-color;
+    margin-left: 0.25rem;
+  }
+}
+
+.error {
+  grid-column: 2;
+  margin: 0.25rem 0 0;
+  color: $error-color;
+  font-size: 0.75rem;
+}
+
+@media screen and (max-width: 992px) {
+  .formRow {
+    grid-template-columns: 200px 1fr 60px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .formRow {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  .addresses {
+    .addressList {
+      .addressRow {
+        grid-template-rows: 1fr;
+      }
+    }
+  }
+}
