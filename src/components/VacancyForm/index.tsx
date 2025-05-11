@@ -11,15 +11,16 @@ import { validateVacancy } from '../../utils/validateVacancy';
 import { useModal } from '../../hooks/useModal';
 import { FormField } from '../FormField';
 import { AddressList } from '../AddressList';
-import { postVacancy } from '../../api/api';
 import Modal from '../Modal/Modal';
-import styles from '../../assets/styles/FormCommon.module.scss';
 import { VacancyErrors } from '../../types/Vacancy';
+import { useCreateVacancyMutation } from '../../store/vacancyApi';
+import styles from '../../assets/styles/FormCommon.module.scss';
 
 export default function VacancyForm() {
 
   const dispatch = useAppDispatch();
   const form = useAppSelector(s => s.vacancyForm.details);
+  const [createVacancy] = useCreateVacancyMutation();
   const [errors, setErrors] = useState<VacancyErrors>({ addresses: [] });
   const { isOpen, open, close } = useModal();
 
@@ -55,8 +56,7 @@ export default function VacancyForm() {
     if (hasError) return;
     console.log('Отправка формы:', form);
     try {
-      const result = await postVacancy(form);
-      console.log(result);
+      await createVacancy(form).unwrap();
       dispatch(resetVacancyForm());
       open();
     } catch (error) {

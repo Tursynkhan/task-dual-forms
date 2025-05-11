@@ -6,7 +6,8 @@ import {
   removeAddress as removeServiceAddress,
   addAddress as addServiceAddress,
   setDetails
-} from '../../store/serviceFormSlice';
+} from '../../store/serviceFormSlice'
+import { useCreateServiceMutation } from '../../store/serviceApi';
 import { ServiceErrors } from '../../types/Service';
 import { validateService } from '../../utils/validateService';
 import { useModal } from '../../hooks/useModal';
@@ -15,18 +16,21 @@ import { AddressList } from '../AddressList';
 import checkboxOptions from '../../utils/service';
 import Modal from '../Modal/Modal';
 import styles from '../../assets/styles/FormCommon.module.scss';
-import { postService } from '../../api/api';
 
 
 export default function ServiceForm() {
-  const dispatch = useAppDispatch()
-  const form = useAppSelector(s => s.serviceForm.details)
+  const dispatch = useAppDispatch();
+  const form = useAppSelector((s) => s.serviceForm.details);
+
+  const [createService] = useCreateServiceMutation();
   const { isOpen, open, close } = useModal();
   const [errors, setErrors] = useState<ServiceErrors>({});
 
 
-  const handleField = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value, type, } = e.target;
+  const handleField = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value, type } = e.target;
     const newValue =
       type === 'checkbox'
         ? (e.target as HTMLInputElement).checked
@@ -34,8 +38,15 @@ export default function ServiceForm() {
     dispatch(setDetails({ ...form, [name]: newValue }));
   };
 
-  const handleAddr = (i: number, field: keyof typeof form.addresses[0], value: string) =>
-    dispatch(updateServiceAddress({ id: i, data: { ...form.addresses[i], [field]: value } }));
+  const handleAddr = (
+    i: number,
+    field: keyof typeof form.addresses[0],
+    value: string
+  ) =>
+    dispatch(
+      updateServiceAddress({ id: i, data: { ...form.addresses[i], [field]: value } })
+    );
+
 
 
   const onSubmit = async (e: FormEvent) => {
@@ -47,8 +58,7 @@ export default function ServiceForm() {
     ) || (errs.addresses?.some(a => a.city || a.street) ?? false);
     if (hasError) return;
     try {
-      const result = await postService(form);
-      console.log(result);
+      await createService(form).unwrap();
       dispatch(resetServiceForm());
       open();
     } catch (error) {
