@@ -1,7 +1,7 @@
 import { ChangeEvent, FormEvent, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import {
-  updateVacancyField,
+  setDetails,
   updateVacancyAddress,
   removeVacancyAddress,
   addVacancyAddress,
@@ -11,6 +11,7 @@ import { validateVacancy } from '../../utils/validateVacancy';
 import { useModal } from '../../hooks/useModal';
 import { FormField } from '../FormField';
 import { AddressList } from '../AddressList';
+import { postVacancy } from '../../api/api';
 import Modal from '../Modal/Modal';
 import styles from '../../assets/styles/FormCommon.module.scss';
 import { VacancyErrors } from '../../types/Vacancy';
@@ -18,7 +19,7 @@ import { VacancyErrors } from '../../types/Vacancy';
 export default function VacancyForm() {
 
   const dispatch = useAppDispatch();
-  const form = useAppSelector(s => s.vacancyForm);
+  const form = useAppSelector(s => s.vacancyForm.details);
   const [errors, setErrors] = useState<VacancyErrors>({ addresses: [] });
   const { isOpen, open, close } = useModal();
 
@@ -32,26 +33,36 @@ export default function VacancyForm() {
       payload = value === '' ? '' : Number(value);
     }
 
-    dispatch(updateVacancyField({ [name]: payload }));
+    dispatch(
+      setDetails({
+        ...form,
+        [name]: payload,
+      })
+    );
   };
 
   const handleAddr = (i: number, field: keyof typeof form.addresses[0], value: string) =>
     dispatch(updateVacancyAddress({ id: i, data: { ...form.addresses[i], [field]: value } }));
 
-  const onSubmit = (e: FormEvent) => {
+  const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const errs = validateVacancy(form);
     setErrors(errs);
-    console.log('errors:', errs);
     const hasError =
       Object.values(errs).some(v => v !== undefined) ||
       (errs.addresses?.some(a => a.city || a.street) ?? false);
 
-    console.log('hasError:', hasError);
     if (hasError) return;
-    console.log('form:', form);
-    dispatch(resetVacancyForm());
-    open();
+    console.log('Отправка формы:', form);
+    try {
+      const result = await postVacancy(form);
+      console.log(result);
+      dispatch(resetVacancyForm());
+      open();
+    } catch (error) {
+      console.error('Ошибка при отправке вакансии:', error);
+    }
+
   };
 
   return (

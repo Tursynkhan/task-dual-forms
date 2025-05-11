@@ -1,11 +1,11 @@
 import { useState, ChangeEvent, FormEvent } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import {
-  updateField as updateServiceField,
   updateAddress as updateServiceAddress,
   resetForm as resetServiceForm,
   removeAddress as removeServiceAddress,
   addAddress as addServiceAddress,
+  setDetails
 } from '../../store/serviceFormSlice';
 import { ServiceErrors } from '../../types/Service';
 import { validateService } from '../../utils/validateService';
@@ -15,39 +15,45 @@ import { AddressList } from '../AddressList';
 import checkboxOptions from '../../utils/service';
 import Modal from '../Modal/Modal';
 import styles from '../../assets/styles/FormCommon.module.scss';
+import { postService } from '../../api/api';
 
 
 export default function ServiceForm() {
   const dispatch = useAppDispatch()
-  const form = useAppSelector(s => s.serviceForm)
+  const form = useAppSelector(s => s.serviceForm.details)
   const { isOpen, open, close } = useModal();
   const [errors, setErrors] = useState<ServiceErrors>({});
 
 
   const handleField = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type, } = e.target;
-    const checked = type === 'checkbox' && (e.target as HTMLInputElement).checked;
-    dispatch(updateServiceField({ [name]: type === 'checkbox' ? checked : value }));
+    const newValue =
+      type === 'checkbox'
+        ? (e.target as HTMLInputElement).checked
+        : value;
+    dispatch(setDetails({ ...form, [name]: newValue }));
   };
 
   const handleAddr = (i: number, field: keyof typeof form.addresses[0], value: string) =>
     dispatch(updateServiceAddress({ id: i, data: { ...form.addresses[i], [field]: value } }));
 
 
-  const onSubmit = (e: FormEvent) => {
+  const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const errs = validateService(form);
     setErrors(errs);
-    console.log('1')
-    console.log(form);
     const hasError = Object.values(errs).some(
       v => v !== undefined
     ) || (errs.addresses?.some(a => a.city || a.street) ?? false);
-    console.log(hasError)
-    console.log('error:', errs)
     if (hasError) return;
-    dispatch(resetServiceForm());
-    open();
+    try {
+      const result = await postService(form);
+      console.log(result);
+      dispatch(resetServiceForm());
+      open();
+    } catch (error) {
+      console.error('Ошибка при отправке формы:', error);
+    }
   };
 
   return (
